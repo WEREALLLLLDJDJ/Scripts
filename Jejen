@@ -1,0 +1,69 @@
+local function beamProjectile(g, v0, x0, t) 
+    local c = 0.5*0.5*0.5;
+    local p3 = 0.5*g*t*t + v0*t + x0;
+    local p2 = p3 - (g*t*t + v0*t)/3;
+    local p1 = (c*g*t*t + 0.5*v0*t + x0 - c*(x0+p3))/(3*c) - p2;
+
+    local curve0 = (p1 - x0).magnitude;
+    local curve1 = (p2 - p3).magnitude;
+
+    local b = (x0 - p3).unit;
+    local r1 = (p1 - x0).unit;
+    local u1 = r1:Cross(b).unit;
+    local r2 = (p2 - p3).unit;
+    local u2 = r2:Cross(b).unit;
+    b = u1:Cross(r1).unit;
+
+    local cf1 = CFrame.new(
+        x0.x, x0.y, x0.z,
+        r1.x, u1.x, b.x,
+        r1.y, u1.y, b.y,
+        r1.z, u1.z, b.z
+    )
+
+    local cf2 = CFrame.new(
+        p3.x, p3.y, p3.z,
+        r2.x, u2.x, b.x,
+        r2.y, u2.y, b.y,
+        r2.z, u2.z, b.z
+    )
+
+    return curve0, -curve1, cf1, cf2;
+end
+
+
+    local func = workspace.ChildAdded:Connect(function(f)
+        if f.Name == "Football" and f:IsA("BasePart") then
+            task.wait()
+            local g = Vector3.new(0, -28.1, 0)
+            local t = 8
+            local v0 = f.Velocity
+            local x0 = f.Position
+            local curve0, curve1, cf1, cf2 = beamProjectile(g, v0, x0, t)
+               local line = Instance.new("Beam")
+            local att0 = Instance.new("Attachment")
+            local att1 = Instance.new("Attachment")
+            line.Color = ColorSequence.new(Color3.fromRGB(38, 255, 0))
+               line.Transparency = NumberSequence.new(0, 0)
+            line.CurveSize0 = curve0
+            line.CurveSize1 = curve1
+               line.Name = "Catch"
+            line.Parent = workspace.Terrain
+      
+                
+            line.Segments = 10000
+            att0.Parent = workspace.Terrain
+            att1.Parent = workspace.Terrain
+            att0.CFrame = att0.Parent.CFrame:Inverse() * cf1
+            att1.CFrame = att1.Parent.CFrame:Inverse() * cf2
+               line.Attachment0 = att0
+            line.Attachment1 = att1
+            line.Width0 = 1
+            line.Width1 = 1
+
+           wait(7)
+                att0:Destroy()
+                att1:Destroy()
+                line:Destroy()
+            end
+    end)
