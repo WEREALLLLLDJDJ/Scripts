@@ -1,3 +1,25 @@
+stats.Network.ServerStatsItem["Data Ping"]:GetValue()
+end
+local function getPosInXSeconds(currentPos, direction, speed, seconds)
+    local dist = speed * seconds
+    local pos = currentPos + direction * dist
+    return pos
+end
+local function getTime(dist, speed)
+    return dist / speed
+end
+local function getJumpHeightFromJumpPower()
+    return hum.JumpPower ^ 2 / (2 * ws.Gravity)
+end
+local function removeVectorComponent(vector, component)
+    if component:lower() == "y" then
+        return vector * v3.new(1, 0, 1)
+    elseif component:lower() == "x" then
+        return vector * v3.new(0, 1, 1)
+    elseif component:lower() == "z" then
+        return vector * v3.new(1, 1, 0)
+    end
+end
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
