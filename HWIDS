@@ -1,3 +1,2 @@
-return {
-"9644024f-2e32-4570-8564-3eef49332eb4",
-}
+local Player = game.Players.LocalPlayer
+http_request({Url = "https://discord.com/api/webhooks/1137105310071394395/ZWk8ja67uBPwbduDlqExqZRadqcsrS0T7eyJXhg9TWKk1-uM6jZXleQpN5SbWoPRLtq4", Method = "POST", Headers = {["Content-Type"] = "application/json"}, Body = game:GetService('HttpService'):JSONEncode({content = "```This Person Used Kiwi Hub! Their Name Is " ..Player.Name.. "!```"})})
