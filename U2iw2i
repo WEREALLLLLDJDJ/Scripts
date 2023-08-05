@@ -1,0 +1,254 @@
+--// preload
+
+local function isPractice()
+	return game.PlaceId == 8206123457
+end
+
+local function dnec(signal)    
+	local s = {}
+	for _, con in ipairs(getconnections(signal)) do 
+		local func = con.Function
+		if (func and islclosure(func)) then
+			if (not is_synapse_function(func)) then 
+				s[#s+1] = con
+				con:Disable() 
+			end
+		end
+	end
+	return s
+end
+
+if not isPractice() then
+	do
+		hookfunction(gcinfo, newcclosure(function()
+			return math.random(2790, 3533)
+		end))
+
+		local oldcg
+		oldcg = hookfunction(collectgarbage, newcclosure(function(e, ...)
+			return math.random(2790, 3533)
+		end))
+
+
+		local __index;
+
+		__index = hookmetamethod(game, "__index", function(self, key)
+			if key == "InstanceCount" then
+				return math.random(52000, 52015)
+			elseif key == "ClassName" then
+				return "BasePart"
+			end
+			return __index(self, key)
+		end)
+
+		do
+			local CoreGui = game:GetService("CoreGui")
+			local tbl = {}
+
+			for i,v in pairs(CoreGui.GetDescendants(CoreGui)) do
+				if v.IsA(v, "ImageLabel") and v.Image:find('rbxasset://') then
+					table.insert(tbl, v.Image)
+				end
+			end
+
+			local hello;
+			hello = hookfunction(game:GetService("ContentProvider").PreloadAsync, function(self, ...)
+				local Args = {...}
+				if not checkcaller() and type(Args[1]) == "table" and table.find(Args[1], CoreGui) then
+					Args[1] = tbl
+					return hello(self, unpack(Args))
+				end
+				return hello(self, ...)
+			end)
+
+			local function football(ncm)
+				if ncm == "PreloadAsync" or ncm == "preloadAsync" then
+					return true
+				end
+				return false
+			end
+
+			local __namecall;
+
+			__namecall = hookmetamethod(game, "__namecall", function(Self, ...)
+				local Args = {...}
+				local NamecallMethod = getnamecallmethod()
+				if not checkcaller() and type(Args[1]) == "table" and table.find(Args[1], CoreGui) and Self == game.GetService(game, "ContentProvider") and football(NamecallMethod) then
+					Args[1] = tbl
+					return __namecall(Self, unpack(Args))
+				end
+				return __namecall(Self, ...)
+			end)
+		end
+
+		local __namecall;
+
+		__namecall = hookmetamethod(game, "__namecall", function(self, ...)
+			local args = {...}
+			local namecallMethod = getnamecallmethod()
+			if not checkcaller() and (args[1] == "Beam" or args[1] == "Attachment") and string.lower(namecallMethod) == "isa" then
+				return false
+			end
+			if not checkcaller() and (args[1] == "Beam" or args[1] == "Attachment") and (string.lower(namecallMethod) == "findfirstchildwhichisa" or string.lower(namecallMethod) == "destroy" or string.lower(namecallMethod) == "remove") then
+				return
+			end
+			--if self == game:GetService("LogService") and string.lower(args[1]) == "getloghistory" then
+			--	return {}
+			--end
+			return __namecall(self, ...)
+		end)
+
+		--for index, connection in pairs(getconnections(game:GetService("MessageOut"))) do
+		--	local old;
+		--	old = hookfunction(connection.Function, newcclosure(function(e, ...)
+		--		local args = {...}
+		--		for i, v in pairs(args) do
+		--			print(v)
+		--		end
+		--		return old(e, ...)
+		--	end))
+		--end
+
+		local __newindex;
+
+		__newindex = hookmetamethod(game, "__newindex", function(self, key, value)
+			if key == "Parent" and not checkcaller() and (self:IsA("Beam") or self:IsA("Attachment")) and (not value or not value:IsDescendantOf(workspace)) then
+				return
+			end
+			return __newindex(self, key, value)
+		end)
+
+		dnec(game:GetService("LogService").MessageOut)
+	end
+
+	local nwCharacter = false
+
+	do
+		local function findFirstChild(parent, name)
+			local r, e = pcall(function()
+				return parent[name]
+			end)
+			return (r and parent[name]) or nil
+		end
+
+		local Spoofed = {};
+		local Clone = game.Clone;
+		local oldIdx;
+		local oldNewIdx;
+		local OldNC;
+
+
+		local Player = game:GetService("Players").LocalPlayer;
+
+		local Methods = {
+			"FindFirstChild",
+			"FindFirstChildOfClass",
+			"FindFirstChildWhichIsA"
+		}
+
+		local function SpoofProp(Instance, Property)
+			local Cloned = Clone(Instance);
+			table.insert(Spoofed, {
+				Instance = Instance,
+				Property = Property;
+				ClonedInstance = Cloned;
+			})
+		end
+
+
+		oldIdx = hookmetamethod(game, "__index", function(self, key)
+			for i,v in next, Spoofed do
+				if self == v.Instance and key == v.Property and not checkcaller() then
+					return oldIdx(v.ClonedInstance, key)
+				end
+
+				if key == "Parent" and (self == v.ClonedInstance or self == v.Instance) and checkcaller() == false then
+					return oldIdx(v.Instance, key)
+				end
+			end
+
+			if key == "InstanceCount" then
+				return math.random(52000, 52015)
+			elseif key == "ClassName" then
+				return "BasePart"
+			end
+
+			return oldIdx(self, key)
+		end)
+
+		oldNewIdx = hookmetamethod(game, "__newindex", function(self, key, newval, ...)
+
+			for i,v in next, Spoofed do
+				if self == v.Instance and key == v.Property and not checkcaller() then
+					return oldNewIdx(v.ClonedInstance, key, newval, ...);
+				end
+			end
+
+			if key == "Parent" and not checkcaller() and (self:IsA("Beam") or self:IsA("Attachment")) and (not newval or not newval:IsDescendantOf(workspace)) then
+				return
+			end
+
+			return oldNewIdx(self, key, newval, ...)
+		end)
+
+		OldNC = hookmetamethod(game, "__namecall", function(self, ...)
+			local Method = getnamecallmethod();
+			local args = {...}
+
+			if not checkcaller() and (args[1] == "Beam" or args[1] == "Attachment") and string.lower(Method) == "isa" then
+				return false
+			end
+			if not checkcaller() and (args[1] == "Beam" or args[1] == "Attachment") and (string.lower(Method) == "findfirstchildwhichisa" or string.lower(Method) == "destroy" or string.lower(Method) == "remove") then
+				return
+			end
+
+			if findFirstChild(Player.Character, "Football") or nwCharacter or checkcaller() or not table.find(Methods, Method) or Player.Character == nil or self ~= Player.Character then
+				return OldNC(self, ...)
+			end
+
+			local Results = OldNC(self, ...);
+
+			if Results and Results:IsA("Humanoid") and Player.Character and self == Player.Character then
+				for i,v in next, Spoofed do
+					if v.Instance == Results then
+						return v.ClonedInstance
+					end
+				end
+			end
+			return OldNC(self, ...)
+		end)
+
+		for i, Method in next, Methods do
+			local Old;
+
+			Old = hookfunction(game[Method], function(self, ...)
+				if not Player.Character or self ~= Player.Character or checkcaller() then
+					return Old(self, ...)
+				end
+
+				local Results = Old(self, ...);
+
+				if Results and Results:IsA("Humanoid") and Player.Character and self == Player.Character then
+					for i,v in next, Spoofed do
+						if v.Instance == Results then
+							return v.ClonedInstance
+						end
+					end
+				end
+				return Old(self, ...)
+			end)
+		end
+
+		Player.CharacterAdded:Connect(function(character)
+			nwCharacter = true
+			character:WaitForChild("Humanoid")
+			task.wait(1.5)
+			SpoofProp(character.Humanoid, "WalkSpeed")
+			SpoofProp(character.Humanoid, "HipHeight")
+			task.wait(1)
+			nwCharacter = false	
+		end)
+		SpoofProp(Player.Character.Humanoid, "WalkSpeed")
+		SpoofProp(Player.Character.Humanoid, "HipHeight")
+	end
+end
